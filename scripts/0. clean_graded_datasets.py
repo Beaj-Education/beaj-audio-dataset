@@ -21,14 +21,28 @@ for file_name in os.listdir(graded_dir):
     if file_name.endswith(".csv"):
         file_path = os.path.join(graded_dir, file_name)
         df = pd.read_csv(file_path)
+
+        # Skip files without required 'audio_file_name' column
+        if 'audio_file_name' not in df.columns:
+            print(f"Skipping {file_name}: missing 'audio_file_name' column. Columns: {list(df.columns)}")
+            continue
+
+        print(f"Processing: {file_name}")
         df["grader"] = file_name.split("_")[0]  # Extract grader name from file name
 
         # Add a profile ID column
         df['profile_id'] = df['audio_file_name'].apply(lambda x: x.split('_')[1]).str.replace("profile", "") # Example logic for profile ID
 
+        # Get score columns (all columns not in exclude list)
+        score_cols = [c for c in df.columns if c not in exclude_columns]
+
+        # Convert score columns to numeric (coerce errors to NaN)
+        for col in score_cols:
+            df[col] = pd.to_numeric(df[col], errors='coerce')
+
         # Calculate 'score' and 'total_possible_score' for the current DataFrame
-        df['score'] = df.drop(columns=exclude_columns, errors='ignore').sum(axis=1)
-        df['total_possible_score'] = df.drop(columns=exclude_columns, errors='ignore').notnull().sum(axis=1) * 2
+        df['score'] = df[score_cols].sum(axis=1)
+        df['total_possible_score'] = df[score_cols].notnull().sum(axis=1) * 2
 
         # Create a JSON for each row with scores for columns not in exclude_columns
         df['score_json'] = df.drop(columns=exclude_columns, errors='ignore').apply(lambda row: row.dropna().to_dict(), axis=1)
@@ -41,6 +55,6 @@ combined_df = pd.concat(dataframes, ignore_index=True)
 # Display the combined DataFrame
 print(combined_df[['audio_file_name', 'profile_id', 'score_json']].head())
 # %%
-combined_df.to_csv("../../audio-dataset/data/clean/graded_combined.csv", index=False)
+combined_df.to_csv("../data/clean/graded_combined.csv", index=False)
 
 # %%

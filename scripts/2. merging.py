@@ -4,9 +4,9 @@ from helper_functions import compute_utterance_duration_seconds, normalize_word,
 import json
 import numpy as np
 
-df_ai = pd.read_csv("../../audio-dataset/data/clean/ai_responses_extracted.csv").drop_duplicates()
+df_ai = pd.read_csv("../data/clean/ai_responses_extracted.csv").drop_duplicates()
 
-df_h = pd.read_csv("../../audio-dataset/data/clean/graded_combined.csv")
+df_h = pd.read_csv("../data/clean/graded_combined.csv")
 df_h.rename(columns={'Human Transcription': 'human_transcription'}, inplace=True)
 
 df_h['question_clean'] = df_h['Question'].str.strip()
@@ -34,37 +34,37 @@ column_mapping = {
     # Core identifiers
     'profile_id': 'student_profile_id',
     'id': 'ai_submission_id',
-    'lessonId': 'lesson_id',
-    'questionId': 'question_id',
-    'questionNumber': 'question_number',
-    'difficultyLevel': 'difficulty_level',
-    
+    'lesson_id': 'lesson_id',
+    'question_id': 'question_id',
+    'question_number': 'question_number',
+    'difficulty_level': 'difficulty_level',
+
     # Question & transcriptions
     'question_clean': 'question_text',
     'Question': 'question_text_original',
     'human_transcription': 'transcription_human',
     'ai_transcription': 'transcription_ai',
-    
+
     # Audio & submission metadata
     'audio_file_name': 'audio_filename',
     'Submitted Audio Link': 'audio_link',
-    'submissionDate': 'submission_date',
-    
+    'submission_date': 'submission_date',
+
     # Human grading
     'grader': 'grader_name',
     'score': 'score_human_total',
     'total_possible_score': 'score_human_max',
     'score_json': 'score_human_per_word_json',
     'Notes': 'grader_notes',
-    
+
     # AI feedback
-    'submittedFeedbackJson': 'feedback_ai_json',
+    'submitted_feedback_json': 'feedback_ai_json',
 
     # pre or post
     'pre_or_post': 'pre_or_post'
 }
     
-df_merged['ai_utterance_duration_seconds'] = df_merged['submittedFeedbackJson'].apply(compute_utterance_duration_seconds)
+df_merged['ai_utterance_duration_seconds'] = df_merged['submitted_feedback_json'].apply(compute_utterance_duration_seconds)
 # Rename columns
 df_merged.rename(columns=column_mapping, inplace=True)
 # %%df
@@ -73,7 +73,7 @@ df_merged.rename(columns=column_mapping, inplace=True)
 
 # Parse human per-word feedback into {word: score}
 human_col_candidates = ['score_human_per_word_json', 'score_json']
-ai_col_candidates = ['feedback_ai_json', 'submittedFeedbackJson']
+ai_col_candidates = ['feedback_ai_json', 'submitted_feedback_json']
 
 # Build the new columns
 # Human
