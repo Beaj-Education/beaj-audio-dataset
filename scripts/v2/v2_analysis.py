@@ -19,18 +19,18 @@ import seaborn as sns
 from jiwer import process_words
 
 # Add scripts dir to path so we can import helper_functions
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "v1"))
 from helper_functions import parse_ai_cell, normalize_word
 
 # ──────────────────────────────────────────────
 # Paths
 # ──────────────────────────────────────────────
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-PROJECT_DIR = os.path.dirname(SCRIPT_DIR)
-GRADED_V2_DIR = os.path.join(PROJECT_DIR, "data", "graded_v2")
-AI_RESPONSES_PATH = os.path.join(PROJECT_DIR, "data", "clean", "ai_responses_extracted.csv")
-OUTPUT_CSV = os.path.join(PROJECT_DIR, "data", "clean", "v2_merged_scores.csv")
-OUTPUT_PLOT = os.path.join(PROJECT_DIR, "plots", "v2_pairwise_correlation_heatmap.png")
+PROJECT_DIR = os.path.dirname(os.path.dirname(SCRIPT_DIR))
+GRADED_V2_DIR = os.path.join(PROJECT_DIR, "data", "v2", "graded")
+AI_RESPONSES_PATH = os.path.join(PROJECT_DIR, "data", "v1", "clean", "ai_responses_extracted.csv")
+OUTPUT_CSV = os.path.join(PROJECT_DIR, "data", "v2", "clean", "v2_merged_scores.csv")
+OUTPUT_PLOT = os.path.join(PROJECT_DIR, "plots", "v2", "v2_pairwise_correlation_heatmap.png")
 
 # ──────────────────────────────────────────────
 # Step 1: Load & combine graded_v2 CSVs
@@ -185,6 +185,15 @@ matched = df_merged["ai_total_score"].notna().sum()
 print(f"Matched {matched}/{len(df_merged)} transcribed rows to AI responses")
 print(f"Unmatched: {len(df_merged) - matched}")
 
+# Compute jiwer-based AI words correct (same method as human, using AI transcription)
+df_merged["ai_words_correct_jiwer"] = df_merged.apply(
+    lambda row: compute_words_correct(row["question_clean"], row["ai_transcription"])[0]
+    if pd.notna(row.get("ai_transcription")) else 0,
+    axis=1,
+)
+print(f"\nAI words correct (jiwer): mean={df_merged['ai_words_correct_jiwer'].mean():.2f}, "
+      f"vs Azure-based: mean={df_merged['ai_words_correct'].mean():.2f}")
+
 # %%
 # ──────────────────────────────────────────────
 # Step 4: Build score matrix & compute correlations
@@ -193,9 +202,9 @@ print("\n" + "=" * 70)
 print("Step 4: Building score matrix and computing correlations")
 print("=" * 70)
 
-# For humans: score = words_correct
-# For AI: score = ai_words_correct (words with normalized_rounded == 2)
-# This makes the scales more comparable (both count "correct" words)
+# For humans: score = words_correct (jiwer alignment)
+# For AI: score = ai_words_correct_jiwer (same jiwer alignment, using AI transcription)
+# Both use the same scoring method for a fair comparison
 
 # Pivot human scores: audio_file_name × grader → words_correct
 human_pivot = df_merged.pivot_table(
@@ -207,12 +216,12 @@ human_pivot = df_merged.pivot_table(
 
 # AI scores: one per audio (take from first grader's merge)
 ai_scores = df_merged.drop_duplicates(subset=["audio_file_name"])[
-    ["audio_file_name", "ai_words_correct"]
+    ["audio_file_name", "ai_words_correct_jiwer"]
 ].set_index("audio_file_name")
 
 # Combine into one matrix
 score_matrix = human_pivot.copy()
-score_matrix["AI"] = ai_scores["ai_words_correct"]
+score_matrix["AI"] = ai_scores["ai_words_correct_jiwer"]
 
 # Only keep graders with enough data
 min_transcriptions = 10
@@ -261,23 +270,9 @@ print("=" * 70)
 
 fig, ax = plt.subplots(figsize=(8, 6))
 
-# Create annotation labels that show correlation + overlap count
-annot_labels = corr_matrix.copy().astype(str)
-for i, g1 in enumerate(valid_graders):
-    for j, g2 in enumerate(valid_graders):
-        r_val = corr_matrix.loc[g1, g2]
-        n_val = overlap_matrix.loc[g1, g2]
-        if pd.isna(r_val):
-            annot_labels.loc[g1, g2] = f"n={n_val}"
-        elif i == j:
-            annot_labels.loc[g1, g2] = f"{r_val:.2f}"
-        else:
-            annot_labels.loc[g1, g2] = f"{r_val:.2f}\n(n={n_val})"
-
 sns.heatmap(
     corr_matrix,
-    annot=annot_labels,
-    fmt="",
+    annot=False,
     cmap="YlGnBu_r",
     vmin=0,
     vmax=1,
@@ -297,13 +292,71 @@ plt.close()
 
 # %%
 # ──────────────────────────────────────────────
+# Step 5b: Plot heatmap for reliable graders only
+# ──────────────────────────────────────────────
+print("\n" + "=" * 70)
+print("Step 5b: Generating heatmap for reliable graders (>97% completion)")
+print("=" * 70)
+
+RELIABLE_GRADERS = ["Amna", "Dania", "Rehma", "Rukhshan", "Semal", "AI"]
+reliable_cols = [c for c in RELIABLE_GRADERS if c in score_matrix.columns]
+reliable_matrix = score_matrix[reliable_cols]
+
+n_rel = len(reliable_cols)
+rel_corr = pd.DataFrame(np.nan, index=reliable_cols, columns=reliable_cols)
+rel_overlap = pd.DataFrame(0, index=reliable_cols, columns=reliable_cols, dtype=int)
+
+for i, g1 in enumerate(reliable_cols):
+    for j, g2 in enumerate(reliable_cols):
+        if i == j:
+            rel_corr.loc[g1, g2] = 1.0
+            rel_overlap.loc[g1, g2] = int(reliable_matrix[g1].notna().sum())
+            continue
+        mask = reliable_matrix[g1].notna() & reliable_matrix[g2].notna()
+        n_shared = mask.sum()
+        rel_overlap.loc[g1, g2] = n_shared
+        if n_shared >= 3:
+            r, p = pearsonr(reliable_matrix.loc[mask, g1], reliable_matrix.loc[mask, g2])
+            rel_corr.loc[g1, g2] = r
+
+rel_corr = rel_corr.astype(float)
+
+print(f"Reliable graders included: {reliable_cols}")
+print(f"\nCorrelation matrix (reliable graders):")
+print(rel_corr.round(3).to_string())
+
+# Plot
+fig, ax = plt.subplots(figsize=(7, 5.5))
+
+sns.heatmap(
+    rel_corr,
+    annot=False,
+    cmap="YlGnBu_r",
+    vmin=0,
+    vmax=1,
+    square=True,
+    linewidths=0.5,
+    cbar_kws={"label": "Pearson r"},
+    ax=ax,
+)
+ax.set_title("Pair-wise correlation — Reliable graders + AI\n(>97% completion, word match count)", fontsize=13)
+ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="right")
+
+plt.tight_layout()
+RELIABLE_PLOT = os.path.join(PROJECT_DIR, "plots", "v2", "v2_reliable_graders_heatmap.png")
+plt.savefig(RELIABLE_PLOT, dpi=150, bbox_inches="tight")
+print(f"Saved reliable-graders heatmap to: {RELIABLE_PLOT}")
+plt.close()
+
+# %%
+# ──────────────────────────────────────────────
 # Save merged CSV
 # ──────────────────────────────────────────────
 save_cols = [
     "audio_file_name", "grader", "profile_id", "pre_or_post",
     "question_clean", "Human Transcription", "ai_transcription",
     "human_words_correct", "total_reference_words",
-    "ai_total_score", "ai_words_correct", "ai_n_words",
+    "ai_total_score", "ai_words_correct", "ai_words_correct_jiwer", "ai_n_words",
 ]
 existing_cols = [c for c in save_cols if c in df_merged.columns]
 df_merged[existing_cols].to_csv(OUTPUT_CSV, index=False)

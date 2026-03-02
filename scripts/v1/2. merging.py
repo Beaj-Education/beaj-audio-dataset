@@ -4,9 +4,9 @@ from helper_functions import compute_utterance_duration_seconds, normalize_word,
 import json
 import numpy as np
 
-df_ai = pd.read_csv("../data/clean/ai_responses_extracted.csv").drop_duplicates()
+df_ai = pd.read_csv("../../data/v1/clean/ai_responses_extracted.csv").drop_duplicates()
 
-df_h = pd.read_csv("../data/clean/graded_combined.csv")
+df_h = pd.read_csv("../../data/v1/clean/graded_combined.csv")
 df_h.rename(columns={'Human Transcription': 'human_transcription'}, inplace=True)
 
 df_h['question_clean'] = df_h['Question'].str.strip()
@@ -92,7 +92,7 @@ else:
 
 # %%
 # Save a CSV for analysis notebook to consume (serialize dicts as JSON strings)
-out_path = '../data/clean/merged_for_analysis.csv'
+out_path = '../../data/v1/clean/merged_for_analysis.csv'
 df_save = df_merged.copy()
 for c in ['feedback_human_json', 'feedback_ai_json']:
     df_save[c] = df_save[c].apply(lambda x: json.dumps(x, ensure_ascii=False))
@@ -143,7 +143,7 @@ print("\nColumn order:")
 for i, col in enumerate(df_final.columns, 1):
     print(f"{i:2d}. {col}")
 
-out_path = '../data/clean/merged_for_analysis.csv'
+out_path = '../../data/v1/clean/merged_for_analysis.csv'
 df_final.head()
 df_final.to_csv(out_path, index=False)
 # %%

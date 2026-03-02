@@ -2,7 +2,7 @@
 import pandas as pd
 import ast
 
-df_comb = pd.read_csv("../data/graded/ai_responses_raw.csv")
+df_comb = pd.read_csv("../../data/v1/graded/ai_responses_raw.csv")
 
 def extract_first_element(val):
     """Extract first element from a list or string representation of a list. Always returns a hashable type."""
@@ -68,4 +68,4 @@ cols_to_keep = ['id', 'lesson_id', 'question_id', 'profile_id', 'submission_date
 df_final = df_comb[cols_to_keep]
 
 # %%
-df_final.to_csv("../data/clean/ai_responses_extracted.csv", index=False)
+df_final.to_csv("../../data/v1/clean/ai_responses_extracted.csv", index=False)

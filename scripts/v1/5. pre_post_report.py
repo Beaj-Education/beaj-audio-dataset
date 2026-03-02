@@ -20,10 +20,10 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_TABLE_ALIGNMENT
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-PROJECT_DIR = os.path.dirname(SCRIPT_DIR)
-DATA_PATH = os.path.join(PROJECT_DIR, "data", "clean", "merged_for_analysis.csv")
+PROJECT_DIR = os.path.dirname(os.path.dirname(SCRIPT_DIR))
+DATA_PATH = os.path.join(PROJECT_DIR, "data", "v1", "clean", "merged_for_analysis.csv")
 REPORT_DIR = os.path.join(PROJECT_DIR, "reports")
-REPORT_PATH = os.path.join(REPORT_DIR, "pre_post_comparison_report.docx")
+REPORT_PATH = os.path.join(REPORT_DIR, "v1", "pre_post_comparison_report.docx")
 
 
 def load_data():

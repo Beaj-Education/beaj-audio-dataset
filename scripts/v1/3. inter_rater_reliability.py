@@ -3,7 +3,7 @@ import pandas as pd
 import json
 import numpy as np
 
-df_comb = pd.read_csv("../data/clean/merged_for_analysis.csv")
+df_comb = pd.read_csv("../../data/v1/clean/merged_for_analysis.csv")
 
 # Find audio files that were graded by multiple graders
 graders_per_file = df_comb.groupby('audio_filename')['grader_name'].nunique()
@@ -417,10 +417,10 @@ available_cols = [c for c in display_cols if c in df_totals.columns]
 print(df_totals[available_cols].to_string(index=False))
 
 # Save detailed comparison to CSV
-df_word_comparison.to_csv('../data/clean/human_interrater_word_mismatches.csv', index=False)
-df_totals.to_csv('../data/clean/human_interrater_disagreements.csv', index=False)
-print(f"\nSaved word-level comparison to: ../data/clean/human_interrater_word_mismatches.csv")
-print(f"Saved totals comparison to: ../data/clean/human_interrater_disagreements.csv")
+df_word_comparison.to_csv('../../data/v1/clean/human_interrater_word_mismatches.csv', index=False)
+df_totals.to_csv('../../data/v1/clean/human_interrater_disagreements.csv', index=False)
+print(f"\nSaved word-level comparison to: ../../data/v1/clean/human_interrater_word_mismatches.csv")
+print(f"Saved totals comparison to: ../../data/v1/clean/human_interrater_disagreements.csv")
 
 # Show cases where humans disagreed significantly (diff > 1 point on a word)
 if 'human_1' in df_word_comparison.columns and 'human_2' in df_word_comparison.columns:
@@ -431,5 +431,5 @@ if 'human_1' in df_word_comparison.columns and 'human_2' in df_word_comparison.c
         print(f"\n\nHigh disagreement cases (human diff > 1 point):")
         print("-" * 80)
         print(high_disagreement[['audio_filename', 'word', 'human_1', 'human_2', 'human_diff', 'ai_score']].to_string(index=False))
-        high_disagreement.to_csv('../data/clean/high_disagreement_cases.csv', index=False)
-        print(f"\nSaved high disagreement cases to: ../data/clean/high_disagreement_cases.csv")
+        high_disagreement.to_csv('../../data/v1/clean/high_disagreement_cases.csv', index=False)
+        print(f"\nSaved high disagreement cases to: ../../data/v1/clean/high_disagreement_cases.csv")

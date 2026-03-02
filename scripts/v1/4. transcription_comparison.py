@@ -65,7 +65,7 @@ def word_error_rate(reference, hypothesis):
 
 # %%
 # Load data
-df = pd.read_csv("../data/clean/merged_for_analysis.csv")
+df = pd.read_csv("../../data/v1/clean/merged_for_analysis.csv")
 
 print(f"Total records: {len(df)}")
 print(f"\nColumns available:")
@@ -388,7 +388,7 @@ output_cols = [
 output_cols = [c for c in output_cols if c in df.columns]
 df_output = df[output_cols].copy()
 
-output_path = '../data/clean/transcription_comparison.csv'
+output_path = '../../data/v1/clean/transcription_comparison.csv'
 df_output.to_csv(output_path, index=False)
 print(f"\n\nSaved detailed comparison to: {output_path}")
 

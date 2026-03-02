@@ -21,7 +21,7 @@ connection_string = f"postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{
 engine = create_engine(connection_string)
 
 # %%
-graded_df = pd.read_csv("../data/clean/graded_combined.csv")
+graded_df = pd.read_csv("../../data/v1/clean/graded_combined.csv")
 
 # %%
 filt_df = graded_df[['audio_file_name', 'Question', 'Human Transcription', 'profile_id']].drop_duplicates()
@@ -49,6 +49,6 @@ for i, row in filt_df.iterrows():
 df_comb = pd.concat(df_list)
 
 # %%
-df_comb.to_csv("../data/graded/ai_responses_raw.csv", index=False)
+df_comb.to_csv("../../data/v1/graded/ai_responses_raw.csv", index=False)
 
 # %%

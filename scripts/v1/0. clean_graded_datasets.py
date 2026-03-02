@@ -3,7 +3,7 @@ import pandas as pd
 import os
 
 # Define the directory containing the graded CSV files
-graded_dir = "../data/graded"
+graded_dir = "../../data/v1/graded"
 
 # Initialize an empty list to store DataFrames
 dataframes = []
@@ -55,6 +55,6 @@ combined_df = pd.concat(dataframes, ignore_index=True)
 # Display the combined DataFrame
 print(combined_df[['audio_file_name', 'profile_id', 'score_json']].head())
 # %%
-combined_df.to_csv("../data/clean/graded_combined.csv", index=False)
+combined_df.to_csv("../../data/v1/clean/graded_combined.csv", index=False)
 
 # %%

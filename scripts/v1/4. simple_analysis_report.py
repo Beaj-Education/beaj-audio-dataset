@@ -27,10 +27,10 @@ from docx.enum.table import WD_TABLE_ALIGNMENT
 # Paths
 # ──────────────────────────────────────────────
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-PROJECT_DIR = os.path.dirname(SCRIPT_DIR)
-DATA_PATH = os.path.join(PROJECT_DIR, "data", "clean", "merged_for_analysis.csv")
+PROJECT_DIR = os.path.dirname(os.path.dirname(SCRIPT_DIR))
+DATA_PATH = os.path.join(PROJECT_DIR, "data", "v1", "clean", "merged_for_analysis.csv")
 REPORT_DIR = os.path.join(PROJECT_DIR, "reports")
-REPORT_PATH = os.path.join(REPORT_DIR, "grading_agreement_report.docx")
+REPORT_PATH = os.path.join(REPORT_DIR, "v1", "grading_agreement_report.docx")
 
 
 # ──────────────────────────────────────────────
