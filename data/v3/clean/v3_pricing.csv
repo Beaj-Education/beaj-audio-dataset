@@ -1,0 +1,47 @@
+model	word_error_rate_perc	price_usd_per_1000_min	median_speed_factor
+Scribe v2	2.30%	6.67	31.6
+Gemini 3.1 Pro			
+Gemini 3 Pro	2.90%		6
+Voxtral Small	3.00%	4	70.1
+Gemini 2.5 Pro	3.10%		12
+Gemini 3 Flash	3.10%		12.7
+Scribe	3.20%	6.67	37.8
+Universal-3 Pro	3.30%	3.5	40
+Voxtral Mini	3.70%	3	68.1
+Universal	4.00%	2.5	112.1
+Gemini 2.0 Flash	4.00%		50.7
+Gemini 2.0 Flash Lite	4.00%		48.6
+Voxtral Mini	4.00%	1	78
+Slam-1	4.10%	4.5	79.5
+GPT-4o Transcribe	4.10%	6	33.7
+GPT-4o Transcribe	4.10%	6	33.7
+Whisper Large v2	4.20%	6	27.6
+Parakeet TDT 0.6B V3	4.20%	1.32	40.2
+Solaria-1	4.20%	8.33	45.9
+Whisper Large v3	4.30%	1.15	51.1
+Enhanced	4.30%	6.7	24.7
+Amazon Transcribe	4.30%	24	19.1
+Canary Qwen 2.5B NVIDIA	4.40%	0.74	5.7
+GPT-4o Mini Transcribe	4.60%	3	47.2
+Chirp 3	4.60%	16	30.7
+Whisper Large v3 Turbo	4.80%	0.67	375.1
+Whisper Large v3	4.80%	1	484.1
+Whisper Large v3	4.80%	1	86.2
+Wizper Large v3	4.90%	0.5	146.5
+Nova 2 Pro	5.00%	3.1	22.6
+Parakeet RNNT 1.1B	5.00%	1.91	6.3
+Standard	5.30%	4	44.7
+Gemini 2.5 Flash Lite	5.30%	0.58	71.9
+Gemini 2.5 Flash	5.30%	1.92	82.8
+Nova-3	5.40%	4.3	434
+Nova-2	5.60%	4.3	581.9
+Incredibly Fast Whisper	5.80%	1.49	54
+Nova 2 Omni	5.90%	1.85	39.2
+Chirp 2	6.00%	16	14.6
+Parakeet TDT 0.6B V2	6.80%	0	59.8
+Whisper Large v3	7.40%	1.5	121.2
+Whisper Large v3	10.20%	4.23	2.9
+Whisper-Large-v3	10.30%	1.67	90.5
+Base	10.90%	12.5	581.5
+Chirp	31.30%	16	13.6
+Sarvam AI			
