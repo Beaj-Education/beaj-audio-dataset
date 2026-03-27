@@ -44,25 +44,31 @@ Short: reproducible pipeline for cleaning human-graded CSVs, extracting AI respo
    python --version
    pip list
 
-## Repository summary
+## Analysis versions
 
-- `requirements.txt` — Python dependencies used by scripts and the analysis notebook.
+- **v1** — Initial analysis. 5 human graders scored Grade 1 audio on a 0-2 word-level scale; compared against Azure Pronunciation Assessment AI scores.
+- **v2** — Expanded to 8 human graders with dual-grading assignments; inter-rater reliability, AI calibration, and WCPM analysis.
+- **v3 (latest)** — Compares human transcriptions against 11 AI transcription models (Scribe, Gemini, Voxtral, GPT-4o, etc.) using WER and words-correct metrics. Includes pricing and WCPM analysis.
 
-- `data/`
-  - `graded/` — raw grader CSVs (inputs)
-  - `clean/` — cleaned and derived CSVs used for analysis (e.g. `graded_combined.csv`, `ai_responses_extracted.csv`, `merged_for_analysis.csv`, `word_level_summary.csv`, `wcpm_by_student.csv`, `final_analysis_dataset.csv`)
+## Repository structure
+
+- `requirements.txt` — Python dependencies.
 
 - `scripts/`
-  - `0. clean_graded_datasets.py` — normalize & combine human-graded CSVs
-  - `1. extract_ai_responses.py` — parse AI outputs into a tabular CSV
-  - `2. merging.py` — join human and AI tables for analysis
-  - `3. analysis.ipynb` — analysis & plotting notebook
-  - `helper_functions.py` — utilities used by scripts and notebook
+  - `v1/` — data cleaning, merging, inter-rater reliability, and report generation (numbered `0.`–`5.`, plus `helper_functions.py`)
+  - `v2/` — v2 analysis, word-level comparison, and report scripts (`v2_*.py`)
+  - `v3/` — AI transcription WER analysis, duration extraction, and report generation
 
-- `images/` — any source images used in tests
-- `plots/` — generated figures (e.g. `overall_confusion_matrix.png`, `top10_word_confusion_heatmaps.png`)
+- `data/`
+  - `v1/graded/` — raw v1 grader CSVs; `v1/clean/` — cleaned & derived CSVs
+  - `v2/graded/` — v2 grader assignment CSVs; `v2/clean/` — v2 derived CSVs
+  - `v3/ai_transcribed/` — AI model transcriptions; `v3/clean/` — v3 derived CSVs
+
+- `plots/` — generated figures, organised into `v1/`, `v2/`, `v3/` subfolders
+- `reports/` — Word documents, organised into `v1/`, `v2/`, `v3/` subfolders
+
+> Note: some v3 scripts read data from `data/v1/` and `data/v2/` (e.g. human grader CSVs, AI response metadata). These files live where they were originally created; later versions reference them by path.
 
 ## Notes
 
 - If you need precisely Python 3.12.7, use the pyenv option above (pyenv lets you install and pin patch versions).
-- The analysis notebook saves outputs to `data/clean/` and figures to `data/plots/` when run end-to-end.
